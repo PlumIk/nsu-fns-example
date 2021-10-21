@@ -30,7 +30,7 @@ class Worker:
             if self.data.get(key).get('time') <= 0:
                 one = self.do_fns(key)
                 if one is not None:
-                    self.to_back(one)
+                    self.to_back_ok(one, key)
 
         self.re_in()
         self.del_from()
@@ -54,7 +54,8 @@ class Worker:
         for key in self.fordel:
             self.data.pop(key)
 
-    def to_back(self, info):
+    def to_back_ok(self, info, key):
+        ret = dict({'id': key, 'status': 200, 'data': info})
         print('отправил бэку:', info)
         return
 
@@ -78,14 +79,12 @@ class Worker:
 
     def step_ten(self):
         for key in self.data:
-            self.data.get(key).update({'time': self.data.get(key).get('time')-10})
+            self.data.get(key).update({'time': self.data.get(key).get('time') - 10})
         self.do_all_fns()
-        threading.Timer(600,self.step_ten).start()
+        threading.Timer(600, self.step_ten).start()
 
     def step_inst(self):
-        threading.Timer(5,self.do_all_fns).start()
+        threading.Timer(5, self.do_all_fns).start()
 
     def start_timer(self):
         threading.Timer(600, self.step_ten).start()
-
-
