@@ -3,7 +3,7 @@ import json
 
 import requests
 
-from jWork import Jwork
+from j_work import Jwork
 
 
 class NalogRuPython:
@@ -24,14 +24,14 @@ class NalogRuPython:
         """
         Authorization using INN and password of user lk nalog.ru
         """
-        data = self.informator.getInf()
+        data = self.informator.get_inf()
 
         if data is not None:
             url = f'https://{self.HOST}/v2/mobile/users/lkfl/auth'
             payload = {
-                'inn': str(data.GetINN()),
-                'client_secret': data.GetSEC(),
-                'password': data.GetPASS()
+                'inn': str(data.get_inn()),
+                'client_secret': data.get_sec(),
+                'password': data.get_pass()
             }
             headers = {
                 'Host': self.HOST,
@@ -44,10 +44,6 @@ class NalogRuPython:
             }
 
             resp = requests.post(url, json=payload, headers=headers)
-            print(resp.text)
-            print(resp.status_code)
-            print(resp.reason)
-            print('debug', payload, headers, str(resp), resp.status_code)
             try:
                 self.__session_id = resp.json()['sessionId']
             except Exception as e:
@@ -67,7 +63,7 @@ class NalogRuPython:
         :return: Ticket id. Example "5f3bc6b953d5cb4f4e43a06c"
         """
         url = f'https://{self.HOST}/v2/ticket'
-        data = self.informator.getInf()
+        data = self.informator.get_inf()
         if data == None:
             self.set_session_id()
             return self._get_ticket_id(qr)
@@ -109,5 +105,7 @@ class NalogRuPython:
         }
 
         resp = requests.get(url, headers=headers)
+
+
 
         return resp.json()

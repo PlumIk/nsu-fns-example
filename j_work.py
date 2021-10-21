@@ -1,7 +1,7 @@
 import json
 import random
 
-from myData import MyDataMass, MyData
+from my_data import MyDataMass, MyData
 
 
 class Jwork:
@@ -9,68 +9,68 @@ class Jwork:
     def __init__(self):
 
         self.data = MyDataMass()  # Кастом массив данных
-        self.enduse = 1  # На каком количестве использований остановиться
+        self.enduse = 80  # На каком количестве использований остановиться
         self.lastuse = None  # номер последнего использованного набора данных
 
     # Сохранить текущий массив
-    def saveDict(self):
+    def save_dict(self):
         with open("fns_info.json", "w") as write_file:
-            json.dump(self.data.CodeMe(), write_file, indent=4)
+            json.dump(self.data.code_me(), write_file, indent=4)
 
     # Вернуть массив под номером r
-    def partDickt(self, r):
-        return self.data.GetI(r)
+    def part_dict(self, r):
+        return self.data.get_i(r)
 
     # Добавить в json новые данные
-    def saveNewData(self, inn, password, client_secret):
-        self.loadDict()
+    def save_new_data(self, inn, password, client_secret):
+        self.load_dict()
         self.data.append(MyData(inn, password, client_secret, 0))
-        self.saveDict()
+        self.save_dict()
 
     # Некоторые тестовые значения(потом изменить)
-    def testData(self):
-        self.saveNewData(111, 'qwerty', 'vegan')
-        self.saveNewData(222, 'asdfgh', 'ne vegan')
+    def test_data(self):
+        self.save_new_data(111, 'qwerty', 'vegan')
+        self.save_new_data(222, 'asdfgh', 'ne vegan')
 
     # Загрузить массив из json
-    def loadDict(self):
+    def load_dict(self):
         with open("fns_info.json", "r") as read_file:
-            self.data.UnCodeData(json.load(read_file))
+            self.data.uncode_me(json.load(read_file))
 
     # Получить массив с данными для установления соединения. Если такого нет, то вернуть None
-    def getInf(self) -> MyData:
+    def get_inf(self) -> MyData:
 
         if self.lastuse is None:  # такой случай возможен только при установлении соединения или поиске новго набора,
             # поэтому использование не добавляется
-            self.lastuse = self.getCanUse()
+            self.lastuse = self.get_can_use()
             if self.lastuse is None:
                 return None  # Нет подходящих наборов
-            return self.data.GetI(self.lastuse)
-        elif not self.tryToUse():  # если набор исчерпал своё количество использований, последний
+            return self.data.get_i(self.lastuse)
+        elif not self.try_to_use():  # если набор исчерпал своё количество использований, последний
             # использованный None и мы пытаемся найти новый
-            self.lastuse = self.getCanUse()
-            return self.getInf()
+            self.lastuse = self.get_can_use()
+            return self.get_inf()
 
         if (self.lastuse == None):
             return None
-        self.data.GetI(self.lastuse).Use()
-        self.saveDict()
-        return self.data.GetI(self.lastuse)
+        self.data.get_i(self.lastuse).use()
+        self.save_dict()
+        return self.data.get_i(self.lastuse)
 
     # Проверка, можно ли ещё использовать последний выбранный набор
-    def tryToUse(self) -> bool:
+    def try_to_use(self) -> bool:
         r = self.lastuse
-        if (self.data.GetI(r).GetUSE() >= self.enduse):
+        if (self.data.get_i(r).get_use() >= self.enduse):
             return False
         return True
 
     # Получение номера набора, который можно использовать. Если такого нет, то вернуть None
-    def getCanUse(self) -> int:
-        self.loadDict()
+    def get_can_use(self) -> int:
+        self.load_dict()
         myhave = list()
         r = (random.randrange(0, self.data.size(), 1))
         donow = True
-        while (self.data.GetI(r).GetUSE() >= self.enduse and donow):
+        while (self.data.get_i(r).get_use() >= self.enduse and donow):
             myhave.append(r)
             myhave = list(set(myhave))
             if (len(myhave) == self.data.size()):
@@ -82,12 +82,12 @@ class Jwork:
         return None
 
     # Обнулить количество использований
-    def zeroedUse(self):
-        self.loadDict()
-        self.data.ZeroUse()
-        self.saveDict()
+    def zeroed_use(self):
+        self.load_dict()
+        self.data.zero_use()
+        self.save_dict()
 
     # Обнулить количество использований всех данных
-    def doEmpty(self):
+    def do_empty(self):
         self.data = MyDataMass()
-        self.saveDict()
+        self.save_dict()
