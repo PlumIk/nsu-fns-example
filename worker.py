@@ -56,7 +56,7 @@ class Worker:
 
     def to_back_ok(self, info, key):
         ret = dict({'id': key, 'status': 200, 'data': info})
-        print('отправил бэку:', info)
+        print('отправил бэку:', ret)
         return
 
     def do_fns(self, key):
