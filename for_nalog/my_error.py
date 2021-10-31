@@ -1,15 +1,10 @@
 class My_error(ValueError):
 
-    def __int__(self, what):
+    def __init__(self, my_type, text='', ex=0):
         super()
-        self.my_type = what
-
-    def __init__(self, text, ex):
-        super()
-        self.my_type = 0
+        self.my_type = my_type
         self.text = text
         self.ex = ex
-
 
 
 """
@@ -17,4 +12,5 @@ class My_error(ValueError):
 0 - ошибка с возвращаемым кодом
 1 - ошибка при установки свзяи с фнс
 2 - кончились неиспользованные записи
+3 - проблема с ticket_id
 """

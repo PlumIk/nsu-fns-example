@@ -24,7 +24,6 @@ class Worker:
         return
 
     def do_all_fns(self):
-        print(self.data)
         self.fordel = list()
         self.forupdate = list()
         for key in self.data:
@@ -43,12 +42,18 @@ class Worker:
             self.data.get(key).update({'iter': self.data.get(key).get('iter') + 1})
             if self.data.get(key).get('iter') >= 4:
                 self.fordel.append(key)
+            else:
+                self.data.get(key).update({'time': 10})
+            '''
+            if self.data.get(key).get('iter') >= 4:
+                self.fordel.append(key)
             elif self.data.get(key).get('iter') == 1:
                 self.data.get(key).update({'time': 10})
             elif self.data.get(key).get('iter') == 2:
                 self.data.get(key).update({'time': 60})
             elif self.data.get(key).get('iter') == 3:
                 self.data.get(key).update({'time': 24 * 60})
+            '''
         return
 
     def del_from(self):
@@ -65,6 +70,7 @@ class Worker:
             ret = dict({'id': key, 'status': err_code, 'data': ''})
             print('отправил бэку:', ret)
             return
+        print('А чего ты, собственно, ожидал? ', err_type)
         return
 
     def do_fns(self, key):
@@ -75,6 +81,7 @@ class Worker:
                 self.forupdate.append(key)
             else:
                 self.to_back_not_ok(key, e.my_type)
+                self.fordel.append(key)
             return None
         if ret.get('status') == 1:
             try:
@@ -84,12 +91,14 @@ class Worker:
                     self.forupdate.append(key)
                 else:
                     self.to_back_not_ok(key, e.my_type)
+                    self.fordel.append(key)
                 return None
         elif ret.get('status') != 2:
             if self.data.get(key).get('iter') < 3:
                 self.forupdate.append(key)
             else:
                 self.to_back_not_ok(key, 0, ret.get('status'))
+                self.fordel.append(key)
             return None
         self.fordel.append(key)
         return ret
@@ -98,10 +107,12 @@ class Worker:
         for key in self.data:
             self.data.get(key).update({'time': self.data.get(key).get('time') - 10})
         self.do_all_fns()
-        threading.Timer(600, self.step_ten).start()
+        # threading.Timer(600, self.step_ten).start()
+        threading.Timer(10, self.step_ten).start()
 
     def step_inst(self):
         threading.Timer(5, self.do_all_fns).start()
 
     def start_timer(self):
-        threading.Timer(600, self.step_ten).start()
+        # threading.Timer(600, self.step_ten).start()
+        threading.Timer(10, self.step_ten).start()

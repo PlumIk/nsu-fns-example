@@ -81,8 +81,8 @@ class NalogRuPython:
                 'User-Agent': self.USER_AGENT,
             }
             resp = requests.post(url, json=payload, headers=headers)
-            if resp.status_code != 200:
-                raise My_error(resp.reason, resp.status_code)
+            if resp.status_code == 200:
+                raise My_error(3)
             return resp.json()["id"]
 
     def get_ticket(self, qr: str) -> dict:
