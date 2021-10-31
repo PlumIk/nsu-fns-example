@@ -1,5 +1,5 @@
 import json
-from nalog_python import NalogRuPython
+from for_nalog.nalog_python import NalogRuPython
 
 
 def request_to_fns(qr_code):

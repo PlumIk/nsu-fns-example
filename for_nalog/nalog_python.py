@@ -3,7 +3,8 @@ import json
 
 import requests
 
-from j_work import Jwork
+from for_nalog.j_work import Jwork
+from for_nalog.my_error import My_error
 
 
 class NalogRuPython:
@@ -17,14 +18,14 @@ class NalogRuPython:
 
     def __init__(self):
         self.__session_id = None
-        self.informator = Jwork()
+        self.inform = Jwork()
         self.set_session_id()
 
     def set_session_id(self) -> None:
         """
         Authorization using INN and password of user lk nalog.ru
         """
-        data = self.informator.get_inf()
+        data = self.inform.get_inf()
 
         if data is not None:
             url = f'https://{self.HOST}/v2/mobile/users/lkfl/auth'
@@ -47,13 +48,13 @@ class NalogRuPython:
             try:
                 self.__session_id = resp.json()['sessionId']
             except Exception as e:
-                raise ValueError("Ошибка ФНС. Дамп json\n" + str(resp.json()))
+                raise My_error(1)
             return
 
         # print(data.GetINN())
         # print(data.GetPASS())
         # print(data.GetSEC())
-        raise ValueError("Нет не использованных записей \n")
+        raise My_error(2)
 
     def _get_ticket_id(self, qr: str) -> str:
         """
@@ -63,8 +64,8 @@ class NalogRuPython:
         :return: Ticket id. Example "5f3bc6b953d5cb4f4e43a06c"
         """
         url = f'https://{self.HOST}/v2/ticket'
-        data = self.informator.get_inf()
-        if data == None:
+        data = self.inform.get_inf()
+        if data is None:
             self.set_session_id()
             return self._get_ticket_id(qr)
         else:
@@ -81,7 +82,7 @@ class NalogRuPython:
             }
             resp = requests.post(url, json=payload, headers=headers)
             if resp.status_code != 200:
-                raise IOError(resp.reason)
+                raise My_error(resp.reason, resp.status_code)
             return resp.json()["id"]
 
     def get_ticket(self, qr: str) -> dict:
@@ -105,7 +106,5 @@ class NalogRuPython:
         }
 
         resp = requests.get(url, headers=headers)
-
-
 
         return resp.json()

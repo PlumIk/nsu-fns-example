@@ -1,6 +1,7 @@
 import threading
 
-from nalog_python import NalogRuPython
+from for_nalog.my_error import My_error
+from for_nalog.nalog_python import NalogRuPython
 
 
 class Worker:
@@ -59,20 +60,36 @@ class Worker:
         print('отправил бэку:', ret)
         return
 
+    def to_back_not_ok(self, key, err_type, err_code=0):
+        if err_code != 0:
+            ret = dict({'id': key, 'status': err_code, 'data': ''})
+            print('отправил бэку:', ret)
+            return
+        return
+
     def do_fns(self, key):
         try:
             ret = self.nalog.get_ticket(self.data.get(key).get('qr'))
-        except Exception as e:
-            self.forupdate.append(key)
+        except My_error as e:
+            if self.data.get(key).get('iter') < 3:
+                self.forupdate.append(key)
+            else:
+                self.to_back_not_ok(key, e.my_type)
             return None
         if ret.get('status') == 1:
             try:
                 ret = self.nalog.get_ticket(self.data.get(key).get('qr'))
-            except Exception as e:
-                self.forupdate.append(key)
+            except My_error as e:
+                if self.data.get(key).get('iter') < 3:
+                    self.forupdate.append(key)
+                else:
+                    self.to_back_not_ok(key, e.my_type)
                 return None
         elif ret.get('status') != 2:
-            self.forupdate.append(key)
+            if self.data.get(key).get('iter') < 3:
+                self.forupdate.append(key)
+            else:
+                self.to_back_not_ok(key, 0, ret.get('status'))
             return None
         self.fordel.append(key)
         return ret

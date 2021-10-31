@@ -1,7 +1,7 @@
 import json
 import random
 
-from my_data import MyDataMass, MyData
+from for_nalog.my_data import MyDataMass, MyData
 
 
 class Jwork:
@@ -14,7 +14,7 @@ class Jwork:
 
     # Сохранить текущий массив
     def save_dict(self):
-        with open("fns_info.json", "w") as write_file:
+        with open("for_nalog/fns_info.json", "w") as write_file:
             json.dump(self.data.code_me(), write_file, indent=4)
 
     # Вернуть массив под номером r
@@ -34,7 +34,7 @@ class Jwork:
 
     # Загрузить массив из json
     def load_dict(self):
-        with open("fns_info.json", "r") as read_file:
+        with open("for_nalog/fns_info.json", "r") as read_file:
             self.data.uncode_me(json.load(read_file))
 
     # Получить массив с данными для установления соединения. Если такого нет, то вернуть None
