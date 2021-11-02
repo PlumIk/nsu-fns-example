@@ -47,7 +47,7 @@ class NalogRuPython:
             resp = requests.post(url, json=payload, headers=headers)
             try:
                 self.__session_id = resp.json()['sessionId']
-            except Exception as e:
+            except My_error as e:
                 raise My_error(1)
             return
 
@@ -64,7 +64,7 @@ class NalogRuPython:
         :return: Ticket id. Example "5f3bc6b953d5cb4f4e43a06c"
         """
         url = f'https://{self.HOST}/v2/ticket'
-        data = self.inform.get_inf()
+        data = self.inform.get_inf(True)
         if data is None:
             self.set_session_id()
             return self._get_ticket_id(qr)
@@ -81,7 +81,7 @@ class NalogRuPython:
                 'User-Agent': self.USER_AGENT,
             }
             resp = requests.post(url, json=payload, headers=headers)
-            if resp.status_code == 200:
+            if resp.status_code != 200:
                 raise My_error(3)
             return resp.json()["id"]
 
@@ -92,6 +92,7 @@ class NalogRuPython:
         :param qr: text from qr code. Example "t=20200727T174700&s=746.00&fn=9285000100206366&i=34929&fp=3951774668&n=1"
         :return: JSON ticket
         """
+
         ticket_id = self._get_ticket_id(qr)
         url = f'https://{self.HOST}/v2/tickets/{ticket_id}'
         headers = {

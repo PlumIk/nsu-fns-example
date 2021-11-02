@@ -9,8 +9,8 @@ class Jwork:
     def __init__(self):
 
         self.data = MyDataMass()  # Кастом массив данных
-        self.enduse = 80  # На каком количестве использований остановиться
-        self.lastuse = None  # номер последнего использованного набора данных
+        self.end_use = 1  # На каком количестве использований остановиться
+        self.last_use = None  # номер последнего использованного набора данных
 
     # Сохранить текущий массив
     def save_dict(self):
@@ -38,29 +38,26 @@ class Jwork:
             self.data.uncode_me(json.load(read_file))
 
     # Получить массив с данными для установления соединения. Если такого нет, то вернуть None
-    def get_inf(self) -> MyData:
-
-        if self.lastuse is None:  # такой случай возможен только при установлении соединения или поиске новго набора,
+    def get_inf(self, with_use=False) -> MyData:
+        if self.last_use is None:  # такой случай возможен только при установлении соединения или поиске новго набора,
             # поэтому использование не добавляется
-            self.lastuse = self.get_can_use()
-            if self.lastuse is None:
+            self.last_use = self.get_can_use()
+            if self.last_use is None:
                 return None  # Нет подходящих наборов
-            return self.data.get_i(self.lastuse)
+            return self.data.get_i(self.last_use)
         elif not self.try_to_use():  # если набор исчерпал своё количество использований, последний
             # использованный None и мы пытаемся найти новый
-            self.lastuse = self.get_can_use()
-            return self.get_inf()
-
-        if (self.lastuse == None):
-            return None
-        self.data.get_i(self.lastuse).use()
+            self.last_use = self.get_can_use()
+            return self.get_inf(with_use)
+        if with_use:
+            self.data.get_i(self.last_use).use()
         self.save_dict()
-        return self.data.get_i(self.lastuse)
+        return self.data.get_i(self.last_use)
 
     # Проверка, можно ли ещё использовать последний выбранный набор
     def try_to_use(self) -> bool:
-        r = self.lastuse
-        if (self.data.get_i(r).get_use() >= self.enduse):
+        r = self.last_use
+        if (self.data.get_i(r).get_use() >= self.end_use):
             return False
         return True
 
@@ -70,7 +67,7 @@ class Jwork:
         myhave = list()
         r = (random.randrange(0, self.data.size(), 1))
         donow = True
-        while (self.data.get_i(r).get_use() >= self.enduse and donow):
+        while (self.data.get_i(r).get_use() >= self.end_use and donow):
             myhave.append(r)
             myhave = list(set(myhave))
             if (len(myhave) == self.data.size()):

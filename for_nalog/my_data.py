@@ -13,7 +13,7 @@ class MyData:
 
     # Сохранит, что было использование
     def use(self):
-        self.__INUSE += 1;
+        self.__INUSE += 1
         return self
 
     # Получить ИНН, пароль, специальное поле

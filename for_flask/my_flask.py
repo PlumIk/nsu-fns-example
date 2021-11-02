@@ -7,7 +7,7 @@ from flask import Flask, jsonify
 from for_flask.worker import Worker
 
 app = Flask(__name__)
-work = Worker()
+work = None
 
 
 # curl -i -H "Content-Type: application/json" -X GET -d '{"qr":"t=20210506T153900&s=263.50&fn=9960440300049147&i=36086&fp=3305237468&n=1", "id":1}' http://localhost:5000/HMC/qr
@@ -34,4 +34,5 @@ def get_task():
 
 
 if __name__ == '__main__':
+    work = Worker()
     app.run(debug=True)
