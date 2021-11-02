@@ -4,7 +4,7 @@ import json
 import requests
 
 from for_nalog.j_work import Jwork
-from for_nalog.my_error import My_error
+from for_nalog.errors import MDataError, MSystemError
 
 
 class NalogRuPython:
@@ -19,7 +19,6 @@ class NalogRuPython:
     def __init__(self):
         self.__session_id = None
         self.inform = Jwork()
-        self.set_session_id()
 
     def set_session_id(self) -> None:
         """
@@ -47,14 +46,14 @@ class NalogRuPython:
             resp = requests.post(url, json=payload, headers=headers)
             try:
                 self.__session_id = resp.json()['sessionId']
-            except My_error as e:
-                raise My_error(1)
+            except Exception as e:
+                raise MSystemError(0)
             return
 
         # print(data.GetINN())
         # print(data.GetPASS())
         # print(data.GetSEC())
-        raise My_error(2)
+        raise MSystemError(1)
 
     def _get_ticket_id(self, qr: str) -> str:
         """
@@ -82,7 +81,7 @@ class NalogRuPython:
             }
             resp = requests.post(url, json=payload, headers=headers)
             if resp.status_code != 200:
-                raise My_error(3)
+                raise MDataError(0)
             return resp.json()["id"]
 
     def get_ticket(self, qr: str) -> dict:
@@ -109,3 +108,6 @@ class NalogRuPython:
         resp = requests.get(url, headers=headers)
 
         return resp.json()
+
+    def restart_use(self):
+        self.inform.zeroed_use()

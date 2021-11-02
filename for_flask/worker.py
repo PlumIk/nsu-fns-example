@@ -1,23 +1,50 @@
 import threading
 
-from for_nalog.my_error import My_error
+from for_nalog.errors import MDataError
+from for_nalog.errors import MSystemError
 from for_nalog.nalog_python import NalogRuPython
 
 
 class Worker:
 
     def __init__(self):
-        self.i_work = False
+        self.timer_on = False
+        self.i_work = True
         self.nalog = NalogRuPython()
-        self.nalog.set_session_id()
+        try:
+            self.nalog.set_session_id()
+        except MSystemError as e:
+            if e.my_type == 0:
+                print('Жду')
+            else:
+                self.i_work = False
+                print('Жду сутки')
         self.data = dict()
         self.data_add = list()
         self.for_del = list()
         self.for_update = list()
 
-    def add_data(self, inid, qr):
+    def re_use(self):
+        self.nalog.restart_use()
         if not self.i_work:
-            self.i_work = True
+            self.try_to_work()
+        threading.Timer(24 * 60 * 60, self.re_use).start()
+        return
+
+    def try_to_work(self):
+        self.i_work = True
+        try:
+            self.nalog.set_session_id()
+        except MSystemError as e:
+            if e.my_type == 0:
+                print('Жду')
+            else:
+                self.i_work = False
+                print('Жду сутки')
+
+    def add_data(self, inid, qr):
+        if not self.timer_on:
+            self.timer_on = True
             self.start_timer()
         if self.data.get(inid) is None:
             one = {inid: {
@@ -30,24 +57,31 @@ class Worker:
         return
 
     def do_all_fns(self):
-        self.for_del = self.data_add[:]
-        self.data_add = list()
-        for one in self.for_del:
-            self.data.update(one)
+        if self.i_work:
+            self.for_del = self.data_add[:]
+            self.data_add = list()
+            for one in self.for_del:
+                self.data.update(one)
 
-        self.for_del = list()
-        self.for_update = list()
+            self.for_del = list()
+            self.for_update = list()
 
-        work_data = self.data.copy()
+            work_data = self.data.copy()
+            try:
+                for key in work_data:
+                    if self.data.get(key).get('time') <= 0:
+                        one = self.do_fns(key)
+                        if one is not None:
+                            self.to_back_ok(one, key)
 
-        for key in work_data:
-            if self.data.get(key).get('time') <= 0:
-                one = self.do_fns(key)
-                if one is not None:
-                    self.to_back_ok(one, key)
-
-        self.re_in()
-        self.del_from()
+                self.re_in()
+                self.del_from()
+            except MSystemError as e:
+                if e.my_type == 0:
+                    print('Жду')
+                else:
+                    self.i_work = False
+                    print('Жду сутки')
 
         return
 
@@ -91,7 +125,7 @@ class Worker:
     def do_fns(self, key):
         try:
             ret = self.nalog.get_ticket(self.data.get(key).get('qr'))
-        except My_error as e:
+        except MDataError as e:
             if self.data.get(key).get('iter') < 3:
                 self.for_update.append(key)
             else:
@@ -101,7 +135,7 @@ class Worker:
         if ret.get('status') == 1:
             try:
                 ret = self.nalog.get_ticket(self.data.get(key).get('qr'))
-            except My_error as e:
+            except MDataError as e:
                 if self.data.get(key).get('iter') < 3:
                     self.for_update.append(key)
                 else:
@@ -124,20 +158,27 @@ class Worker:
         for two in one:
             key = two
         try:
-            ret = self.nalog.get_ticket(one.get(key).get('qr'))
-        except My_error as e:
-            self.data.update(one)
-            return None
-        if ret.get('status') == 1:
             try:
                 ret = self.nalog.get_ticket(one.get(key).get('qr'))
-            except My_error as e:
+            except MDataError as e:
                 self.data.update(one)
                 return None
-        elif ret.get('status') != 2:
-            self.data.update(one)
-            return None
-        self.to_back_ok(ret, key)
+            if ret.get('status') == 1:
+                try:
+                    ret = self.nalog.get_ticket(one.get(key).get('qr'))
+                except MDataError as e:
+                    self.data.update(one)
+                    return None
+            elif ret.get('status') != 2:
+                self.data.update(one)
+                return None
+            self.to_back_ok(ret, key)
+        except MSystemError as e:
+            if e.my_type == 0:
+                print('Жду')
+            else:
+                self.i_work = False
+                print('Жду сутки')
         return
 
     def step_ten(self):
