@@ -1,5 +1,7 @@
 import threading
 
+import requests
+
 from for_nalog.errors import MDataError
 from for_nalog.errors import MSystemError
 from for_nalog.nalog_python import NalogRuPython
@@ -11,6 +13,7 @@ class Worker:
         self.timer_on = False
         self.i_work = True
         self.nalog = NalogRuPython()
+        self.ok_data = list()
         try:
             self.nalog.set_session_id()
         except MSystemError as e:
@@ -72,10 +75,11 @@ class Worker:
                     if self.data.get(key).get('time') <= 0:
                         one = self.do_fns(key)
                         if one is not None:
-                            self.to_back_ok(one, key)
+                            self.ok_data.append([key, 200, one])
 
                 self.re_in()
                 self.del_from()
+                self.to_back()
             except MSystemError as e:
                 if e.my_type == 0:
                     print('Жду')
@@ -109,17 +113,19 @@ class Worker:
         for key in self.for_del:
             self.data.pop(key)
 
-    def to_back_ok(self, info, key):
-        ret = dict({'id': key, 'status': 200, 'data': info})
-        print('отправил бэку:', ret)
-        return
-
-    def to_back_not_ok(self, key, err_type, err_code=0):
-        if err_code != 0:
-            ret = dict({'id': key, 'status': err_code, 'data': ''})
-            print('отправил бэку:', ret)
-            return
-        print('А чего ты, собственно, ожидал? ', err_type)
+    def to_back(self):
+        c_ok_data = self.ok_data.copy()
+        self.ok_data = list()
+        url = f'http://192.168.0.100:8000/HMC/qr'
+        for one in c_ok_data:
+            ret = dict({'id': one[0], 'status': one[1], 'data': one[2]})
+            #print('отправил бэку:', ret)
+            try:
+                resp = requests.post(url, json=ret)
+                if resp.status_code != 200:
+                    self.ok_data.append(one)
+            except Exception as e:
+                self.ok_data.append(one)
         return
 
     def do_fns(self, key):
@@ -129,7 +135,7 @@ class Worker:
             if self.data.get(key).get('iter') < 3:
                 self.for_update.append(key)
             else:
-                self.to_back_not_ok(key, e.my_type)
+                self.ok_data.append([key, e.my_type, None])
                 self.for_del.append(key)
             return None
         if ret.get('status') == 1:
@@ -139,14 +145,14 @@ class Worker:
                 if self.data.get(key).get('iter') < 3:
                     self.for_update.append(key)
                 else:
-                    self.to_back_not_ok(key, e.my_type)
+                    self.ok_data.append([key, e.my_type, None])
                     self.for_del.append(key)
                 return None
         elif ret.get('status') != 2:
             if self.data.get(key).get('iter') < 3:
                 self.for_update.append(key)
             else:
-                self.to_back_not_ok(key, 0, ret.get('status'))
+                self.ok_data.append([key, ret.get('status'), None])
                 self.for_del.append(key)
             return None
         self.for_del.append(key)
@@ -172,7 +178,7 @@ class Worker:
             elif ret.get('status') != 2:
                 self.data.update(one)
                 return None
-            self.to_back_ok(ret, key)
+            self.ok_data.append([key, 200, ret])
         except MSystemError as e:
             if e.my_type == 0:
                 print('Жду')
