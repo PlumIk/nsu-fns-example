@@ -119,7 +119,7 @@ class Worker:
         url = f'http://192.168.0.100:8000/HMC/qr'
         for one in c_ok_data:
             ret = dict({'id': one[0], 'status': one[1], 'data': one[2]})
-            #print('отправил бэку:', ret)
+            print('отправил бэку:', ret)
             try:
                 resp = requests.post(url, json=ret)
                 if resp.status_code != 200:
