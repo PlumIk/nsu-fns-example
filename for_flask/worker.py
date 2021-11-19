@@ -1,10 +1,12 @@
 import threading
+from unittest.mock import patch
 
 import requests
 
 from for_nalog.errors import MDataError
 from for_nalog.errors import MSystemError
 from for_nalog.nalog_python import NalogRuPython
+from for_test.cast_resp import CastResp
 
 
 class Worker:
@@ -114,18 +116,23 @@ class Worker:
             self.data.pop(key)
 
     def to_back(self):
-        c_ok_data = self.ok_data.copy()
-        self.ok_data = list()
-        url = f'http://192.168.0.100:8000/HMC/qr'
-        for one in c_ok_data:
-            ret = dict({'id': one[0], 'status': one[1], 'data': one[2]})
-            print('отправил бэку:', ret)
-            try:
-                resp = requests.post(url, json=ret)
-                if resp.status_code != 200:
+        with patch('requests.post') as perm_mock:
+            perm_mock.return_value = CastResp(200)
+            c_ok_data = self.ok_data.copy()
+            self.ok_data = list()
+            url = f'http://192.168.0.100:8000/HMC/qr'
+            for one in c_ok_data:
+                ret = dict({'id': one[0], 'status': one[1], 'data': one[2]})
+                print('отправил бэку:', ret)
+                try:
+                    print('here')
+                    resp = requests.post(url, json=ret)
+                    if resp.status_code != 200:
+                        print('code ',resp.status_code)
+                        self.ok_data.append(one)
+                except Exception as e:
+                    print('erer')
                     self.ok_data.append(one)
-            except Exception as e:
-                self.ok_data.append(one)
         return
 
     def do_fns(self, key):

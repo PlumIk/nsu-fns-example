@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import requests
 from flask import make_response
 from flask import request
@@ -6,6 +8,7 @@ from flask import Flask, jsonify
 
 # curl -i http://localhost:5000/HMC
 from for_flask.worker import Worker
+from for_test.cast_resp import CastResp
 
 app = Flask(__name__)
 work = None
