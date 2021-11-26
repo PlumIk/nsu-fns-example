@@ -31,7 +31,7 @@ def get_task():
     if not request.json or not 'qr' in request.json or not 'id' in request.json:
         make_response(jsonify({'error': 'Bad input'}), 404)
     work.add_data(request.json['id'], request.json['qr'])
-    return jsonify({'data': 'None'}), 200
+    return jsonify({}), 200
 
 
 if __name__ == '__main__':
