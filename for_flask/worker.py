@@ -1,4 +1,5 @@
 import copy
+import os
 import threading
 import datetime
 import logging
@@ -12,7 +13,7 @@ from for_nalog.nalog_python import NalogRuPython
 class Worker:
 
     def __init__(self):
-        self.url = f'http://3.15.140.143:8080/hmc/api/v1/fns/qr-code-response'
+        self.url = f'{os.getenv("URL_TO_BACK")}hmc/api/v1/fns/qr-code-response'
         self.next_timer = datetime.datetime.now()
         self.timer_on = False
         self.i_work = True
