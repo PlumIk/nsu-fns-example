@@ -11,7 +11,8 @@ app = Flask(__name__)
 work = None
 
 MAX_NUMBER_OF_FILES = 10
-PATH = "/home/alex/Prog/HMC/DProg"
+
+PATH = "/home/alex/Prog/HMC/DProg/log"
 
 
 @app.route('/HMC/qr', methods=['GET'])

@@ -12,7 +12,7 @@ from for_nalog.nalog_python import NalogRuPython
 class Worker:
 
     def __init__(self):
-        self.url = f'http://192.168.0.101:8000/HMC/qr'
+        self.url = f'http://3.15.140.143:8080/hmc/api/v1/fns/qr-code-response'
         self.next_timer = datetime.datetime.now()
         self.timer_on = False
         self.i_work = True
@@ -134,7 +134,10 @@ class Worker:
         return
 
     def sender(self, one):
-        ret = dict({'id': one[0], "receipt": one[2], 'status': one[1]})
+        if one[1]!=200:
+            ret = dict({'id': one[0], "receipt": one[2], 'status': 'ERROR'})
+        else:
+            ret = dict({'id': one[0], "receipt": one[2], 'status': 'OK'})
         try:
             resp = requests.post(self.url, json=ret)
             if resp.status_code != 200:
@@ -194,10 +197,7 @@ class Worker:
             elif ret.get('status') != 2:
                 self.data.update(one)
                 return None
-            if datetime.datetime.now() - self.next_timer > 60:
-                self.sender([key, 200, ret])
-            else:
-                self.ok_data.append([key, 200, ret])
+            self.sender([key, 200, ret])
         except MSystemError as e:
             if e.my_type == 0:
                 pass
