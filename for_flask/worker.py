@@ -12,8 +12,16 @@ from for_nalog.nalog_python import NalogRuPython
 
 class Worker:
 
+    @staticmethod
+    def back_url():
+        env_var = os.getenv("URL_TO_BACK")
+        if not env_var:
+            raise ValueError('Variable "URL_TO_BACK" is not set')
+
+        return f'{env_var}hmc/api/v1/fns/qr-code-response'
+
     def __init__(self):
-        self.url = f'{os.getenv("URL_TO_BACK")}hmc/api/v1/fns/qr-code-response'
+        self.url = self.back_url()
         self.next_timer = datetime.datetime.now()
         self.timer_on = False
         self.i_work = True
