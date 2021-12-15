@@ -35,26 +35,10 @@ def create_log_file_name(date_time):
     return name_file
 
 
-def create_log_file_path(date_time, path):
-    name_file = create_log_file_name(date_time)
-    path_log = path + "/" + name_file
-    return path_log
-
-
 def configuration_of_logger(path: str, max_number_of_files: int, level_log):
-    filetype = ['log']
-    list_logs = [[f for f in os.listdir(path) if f.endswith(type_)] for type_ in filetype]
-    print(list_logs)
-    number_of_files_to_log = len(list_logs[0])
-
-    if number_of_files_to_log >= max_number_of_files:
-        old_log_file = create_log_file_path(search_for_oldest_log(list_logs), path)
-        os.remove(old_log_file)
-
     fn = create_log_file_name(datetime.now())
 
-    logging.basicConfig(filename=os.path.join(path, fn), level=level_log, filemode='w',
-                        format='%(asctime)s - %(levelname)s - %(message)s',
+    logging.basicConfig(filename=os.path.join(path, fn), level=level_log, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
                         datefmt='%Y-%m-%dT%H:%M:%S')
 
     """ logging.basicConfig(filename=fn, level=level_log, encoding='utf-8', filemode='w',

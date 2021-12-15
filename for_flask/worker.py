@@ -16,12 +16,14 @@ class Worker:
     def back_url():
         env_var = os.getenv("URL_TO_BACK")
         if not env_var:
+            logging.error("Empty url")
             raise ValueError('Variable "URL_TO_BACK" is not set')
 
         return f'{env_var}hmc/api/v1/fns/qr-code-response'
 
     def __init__(self):
         self.url = self.back_url()
+        logging.info('url = '+self.url)
         self.next_timer = datetime.datetime.now()
         self.timer_on = False
         self.i_work = True
@@ -149,9 +151,10 @@ class Worker:
             ret = dict({'id': one[0], "receipt": one[2], 'status': 'OK'})
         try:
             resp = requests.post(self.url, json=ret)
+            logging.info('Send for ' + self.url)
             if resp.status_code != 200:
                 self.ok_data.append(one)
-                logging.info('Send for ' + self.url)
+                logging.warning('Can\'t send for ' + self.url)
         except Exception:
             logging.warning('Can\'t send for ' + self.url)
             self.ok_data.append(one)

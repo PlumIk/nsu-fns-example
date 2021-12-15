@@ -12,10 +12,10 @@ work = None
 
 MAX_NUMBER_OF_FILES = 10
 
-PATH = "/home/alex/Prog/HMC/DProg/log"
+PATH = "/var/log/hmc"
 
 
-@app.route('/HMC/qr', methods=['GET'])
+@app.route('/HMC/qr', methods=['POST'])
 def get_task():
     if not request or not request.json or not 'qr' in request.json or not 'id' in request.json:
         return jsonify({'status': 'Not Acceptable'}), 400
@@ -28,4 +28,4 @@ def get_task():
 if __name__ == '__main__':
     some_fun.configuration_of_logger(PATH, MAX_NUMBER_OF_FILES, logging.DEBUG)
     work = Worker()
-    app.run(host='0.0.0.0', port=8090)
+    app.run(host='0.0.0.0', port=8190)
