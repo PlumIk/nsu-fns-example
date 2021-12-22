@@ -18,10 +18,13 @@ PATH = "/var/log/hmc"
 @app.route('/HMC/qr', methods=['POST'])
 def get_task():
     if not request or not request.json or not 'qr' in request.json or not 'id' in request.json:
+        logging.error(f'400')
         return jsonify({'status': 'Not Acceptable'}), 400
     if not some_fun.qr_true(request.json['qr']):
+        logging.error(f'422')
         return jsonify({'status': 'Unprocessable Entity'}), 422
     work.add_data(request.json['id'], request.json['qr'])
+    logging.info(f'incoming.. id={request.json["id"]}; qr={request.json["qr"]}')
     return jsonify({'status': 'Ok'}), 200
 
 

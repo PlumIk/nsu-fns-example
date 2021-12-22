@@ -150,9 +150,11 @@ class Worker:
         else:
             ret = dict({'id': one[0], "receipt": one[2], 'status': 'OK'})
         try:
+            logging.info(f'before sending')
             resp = requests.post(self.url, json=ret)
             logging.info('Send for ' + self.url)
             if resp.status_code != 200:
+                logging.error(f'not 200')
                 self.ok_data.append(one)
                 logging.warning('Can\'t send for ' + self.url)
         except Exception:
