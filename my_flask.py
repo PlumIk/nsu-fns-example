@@ -29,6 +29,8 @@ def get_task():
 
 
 if __name__ == '__main__':
+    logging.info('starting..')
     some_fun.configuration_of_logger(PATH, MAX_NUMBER_OF_FILES, logging.DEBUG)
     work = Worker()
+    logging.info('ok. waiting for flask')
     app.run(host='0.0.0.0', port=8190)
