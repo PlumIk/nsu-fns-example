@@ -37,8 +37,9 @@ def create_log_file_name(date_time):
 
 def configuration_of_logger(path: str, max_number_of_files: int, level_log):
     fn = create_log_file_name(datetime.now())
-
-    logging.basicConfig(filename=os.path.join(path, fn), level=level_log, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
+    a = os.path.join(path, fn)
+    print(a)
+    logging.basicConfig(filename=a, level=level_log, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
                         datefmt='%Y-%m-%dT%H:%M:%S')
 
     """ logging.basicConfig(filename=fn, level=level_log, encoding='utf-8', filemode='w',

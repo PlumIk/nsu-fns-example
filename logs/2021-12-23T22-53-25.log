@@ -1,0 +1,7 @@
+2021-12-23T22:53:25 - INFO - starting..
+2021-12-23T22:53:25 - INFO - url = http://blablabla:8080/hmc/api/v1/fns/qr-code-response
+2021-12-23T22:53:25 - WARNING - End the limit of requests
+2021-12-23T22:53:25 - INFO - ok. waiting for flask
+2021-12-23T22:53:25 - WARNING -  * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+2021-12-23T22:53:25 - INFO -  * Running on http://10.35.7.17:8190/ (Press CTRL+C to quit)

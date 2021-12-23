@@ -2,6 +2,7 @@ import json
 from for_nalog.nalog_python import NalogRuPython
 
 
+
 def request_to_fns(qr_code):
     client = NalogRuPython()
     ticket = client.get_ticket(qr_code)
