@@ -154,11 +154,10 @@ class Worker:
             resp = requests.post(self.url, json=ret)
             logging.info('Send for ' + self.url)
             if resp.status_code != 200:
-                logging.error(f'not 200')
                 self.ok_data.append(one)
-                logging.warning('Can\'t send for ' + self.url)
-        except Exception:
-            logging.warning('Can\'t send for ' + self.url)
+                logging.warning('Not 200. Can\'t send for ' + self.url)
+        except Exception as ex:
+            logging.warning(f'Exc. {str(ex)} Can\'t send for ' + self.url)
             self.ok_data.append(one)
 
     def do_fns(self, key):
@@ -221,16 +220,18 @@ class Worker:
         return
 
     def step_ten(self):
+        logging.info(f'10 min cycle triggered {self.data}')
+
         for key in self.data:
             self.data.get(key).update({'time': self.data.get(key).get('time') - 10})
         self.do_all_fns()
         self.next_timer = datetime.datetime.now()
-        threading.Timer(600, self.step_ten).start()
+        threading.Timer(60, self.step_ten).start()
         # threading.Timer(10, self.step_ten).start()
 
     def step_inst(self):
         threading.Timer(5, self.do_fns_one).start()
 
     def start_timer(self):
-        threading.Timer(600, self.step_ten).start()
+        threading.Timer(60, self.step_ten).start()
         # threading.Timer(10, self.step_ten).start()

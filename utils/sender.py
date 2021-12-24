@@ -1,6 +1,6 @@
 import requests
 
-url = f'http://10.35.7.17:8190/HMC/qr'
+url = f'http://127.0.0.1:8190/HMC/qr'
 payload = {
     'id': 1,
     'qr': "t=20210506T153900&s=263.50&fn=9960440300049147&i=36086&fp=3305237468&n=1"

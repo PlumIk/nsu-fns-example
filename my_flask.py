@@ -25,8 +25,9 @@ def get_task():
     if not some_fun.qr_true(request.json['qr']):
         logging.error(f'422')
         return jsonify({'status': 'Unprocessable Entity'}), 422
-    work.add_data(request.json['id'], request.json['qr'])
     logging.info(f'incoming.. id={request.json["id"]}; qr={request.json["qr"]}')
+    work.add_data(request.json['id'], request.json['qr'])
+    logging.info(f'work.add_data ok.. id={request.json["id"]}; qr={request.json["qr"]}')
     return jsonify({'status': 'Ok'}), 200
 
 
