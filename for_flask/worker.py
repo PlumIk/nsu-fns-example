@@ -191,14 +191,18 @@ class Worker:
         return ret
 
     def do_fns_one(self):
+        logging.info('do_fns_one')  
         one = self.data_add.pop()
         key = 1
         for two in one:
             key = two
         try:
+            logging.info('try 1')  
             try:
+                logging.info('try 2')  
                 ret = self.nalog.get_ticket(one.get(key).get('qr'))
             except MDataError as e:
+                logging.info('exc 2')  
                 self.data.update(one)
                 return None
             if ret.get('status') == 1:
@@ -212,6 +216,7 @@ class Worker:
                 return None
             self.sender([key, 200, ret])
         except MSystemError as e:
+            logging.info('exc 1')  
             if e.my_type == 0:
                 pass
             else:

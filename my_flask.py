@@ -6,15 +6,14 @@ from flask import Flask, jsonify
 
 from for_flask import some_fun
 from for_flask.worker import Worker
-from dotenv import load_dotenv
 
 app = Flask(__name__)
 work = None
 
 MAX_NUMBER_OF_FILES = 10
 
-# PATH = "/var/log/hmc"
-PATH = "Y:/prj/plumIk--nsu-fns-example/nsu-fns-example/logs/"
+PATH = "/var/log/hmc"
+# PATH = "Y:/prj/plumIk--nsu-fns-example/nsu-fns-example/logs/"
 
 
 @app.route('/HMC/qr', methods=['POST'])
@@ -32,8 +31,9 @@ def get_task():
 
 
 if __name__ == '__main__':
-    load_dotenv()
-    some_fun.configuration_of_logger(PATH, MAX_NUMBER_OF_FILES, logging.INFO)
+    # some_fun.configuration_of_logger(PATH, MAX_NUMBER_OF_FILES, logging.INFO)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                        datefmt='%Y-%m-%dT%H:%M:%S')
     logging.info('starting..')
     work = Worker()
     logging.info('ok. waiting for flask')
